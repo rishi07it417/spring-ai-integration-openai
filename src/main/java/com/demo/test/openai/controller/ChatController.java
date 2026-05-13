@@ -19,4 +19,16 @@ public class ChatController {
     public AppChatResponse chat(@RequestParam(name = "message", required = true) String message) {
        return this.chatService.chat(message);
     }
+
+    @GetMapping("/chatWithPromptTemplate")
+    public AppChatResponse chatWithPromptTemplate(@RequestParam(name = "message", required =
+            true) String message, @RequestParam(name = "role", required = true) String role) {
+        return this.chatService.chatWithPromptTemplate(message, role);
+    }
+
+    @GetMapping("/chatWithFluentApi")
+    public AppChatResponse chatWithFluentApi(@RequestParam(name = "message", required =
+            true) String message, @RequestParam(name = "role", required = true) String role) {
+        return this.chatService.chatWithFluentApi(message, role);
+    }
 }
