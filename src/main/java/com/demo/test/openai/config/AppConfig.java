@@ -1,6 +1,8 @@
 package com.demo.test.openai.config;
 
+import com.demo.test.openai.utils.CustomChatAdvisor;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +23,7 @@ public class AppConfig {
     public ChatClient customChatClient() {
 
         return this.chatClientBuilder
+                .defaultAdvisors(advisorSpec -> advisorSpec.advisors(new CustomChatAdvisor(), new SimpleLoggerAdvisor()))
                 .defaultOptions(ChatOptions.builder()
                         .model(OPENAI_MODEL))
                 .build();

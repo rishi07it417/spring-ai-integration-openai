@@ -6,6 +6,8 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -14,9 +16,11 @@ import java.util.Map;
 public class ChatService {
 
     private final ChatClient customChatClient;
+    private final Resource systemPrompt;
 
-    ChatService(@Qualifier("customChatClient") ChatClient customChatClient) {
+    ChatService(@Qualifier("customChatClient") ChatClient customChatClient,@Value("classpath:prompts/AppSystemPrompt.st") Resource systemPrompt) {
         this.customChatClient = customChatClient;
+        this.systemPrompt = systemPrompt;
     }
 
     public AppChatResponse chat(String message) {
@@ -37,10 +41,8 @@ public class ChatService {
                 .build();
 
         SystemPromptTemplate systemPromptTemplate = SystemPromptTemplate.builder()
-                .template("  Act as a {role} and answer the question based on your expertise.\n" )
-                .template("  Return valid JSON with:\n" +
-                        "            - title\n" +
-                        "            - content")
+                .resource(this.systemPrompt)
+                .variables(Map.of("role", role))
                 .build();
 
         // User and System Messages will be combined in the prompt
@@ -65,12 +67,7 @@ public class ChatService {
                 .prompt()
                 .user(message)
                 .system(promptSystemSpec ->
-                        promptSystemSpec.text(
-
-                        "  Act as a {role} and answer the question based on your expertise in bullet points.\n" +
-                        "   Return valid JSON with:\n" +
-                        "            - title\n" +
-                        "            - content")
+                        promptSystemSpec.text(this.systemPrompt)
                              .params(Map.of("role", role)))
                 .call().entity(AppChatResponse.class);
         System.out.println("Fluent API Chat response: " + content.toString());
