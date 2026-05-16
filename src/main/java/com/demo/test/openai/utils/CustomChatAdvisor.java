@@ -8,7 +8,7 @@ import org.springframework.ai.chat.client.advisor.api.CallAdvisor;
 import org.springframework.ai.chat.client.advisor.api.CallAdvisorChain;
 
 public class CustomChatAdvisor implements CallAdvisor {
-    private static final Logger log =
+    private static final Logger logger =
             LoggerFactory.getLogger(CustomChatAdvisor.class);
 
     @Override
@@ -24,12 +24,12 @@ public class CustomChatAdvisor implements CallAdvisor {
     @Override
     public ChatClientResponse adviseCall(ChatClientRequest request,CallAdvisorChain chain) {
 
-        log.info("Before AI call");
+        logger.info("Before AI call");
 
         // Read user prompt
         String userText = request.prompt().getUserMessage().getText();
 
-        log.info("User Prompt: {}", userText);
+        logger.info("User Prompt: {}", userText);
 
         // Add custom context/metadata
         request.context().put("request-start-time",
@@ -38,14 +38,14 @@ public class CustomChatAdvisor implements CallAdvisor {
         // Continue advisor chain
         ChatClientResponse response = chain.nextCall(request);
 
-        log.info("After AI call");
+        logger.info("After AI call");
 
         String content = response.chatResponse()
                 .getResult()
                 .getOutput()
                 .getText();
 
-        log.info("AI Response: {}", content);
+        logger.info("AI Response: {}", content);
 
         return response;
     }
